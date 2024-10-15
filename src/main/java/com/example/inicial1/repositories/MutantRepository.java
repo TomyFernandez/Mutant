@@ -13,4 +13,9 @@ public interface MutantRepository extends org.springframework.data.jpa.repositor
 
         long countByIsMutant(boolean isMutant);
 
+        default Mutant saveIfNotExists(Mutant mutant){
+                Optional<Mutant> existingMutant = findByDna(mutant.getDna());
+                return existingMutant.orElseGet(() -> save(mutant));
+        }
+
 }

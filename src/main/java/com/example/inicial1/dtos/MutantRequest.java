@@ -1,6 +1,5 @@
 package com.example.inicial1.dtos;
 
-
 import lombok.*;
 
 @AllArgsConstructor
@@ -10,7 +9,8 @@ import lombok.*;
 @ToString
 @Builder
 public class MutantRequest {
-
-
     private String[] dna;
+    private String nombre;
+    private String apellido;
+    private String poder;
 }

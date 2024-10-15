@@ -1,5 +1,6 @@
 package com.example.inicial1.controllers;
 
+import com.example.inicial1.dtos.MutantRequest;
 import com.example.inicial1.entities.Mutant;
 import com.example.inicial1.repositories.MutantRepository;
 import com.example.inicial1.services.MutantService;
@@ -22,9 +23,8 @@ public class MutantController{
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> checkMutant(@RequestBody Mutant mutant1) {
-        String[] dnaArray = mutant1.getDna().split(",");
-        String dna = String.join(",", dnaArray);
+    public ResponseEntity<?> checkMutant(@RequestBody MutantRequest mutant1) {
+        String[] dnaArray = mutant1.getDna();
          try {
              boolean isMutant = mutantService.isMutant(dnaArray);
              if (isMutant){
@@ -32,10 +32,10 @@ public class MutantController{
                          .nombre(mutant1.getNombre())
                          .apellido(mutant1.getApellido())
                          .poder(mutant1.getPoder())
-                         .dna(dna)
+                         .dna(String.join(",", dnaArray))
                          .isMutant(true)
                          .build();
-                 mutantRepository.save(mutant);
+                 mutantRepository.saveIfNotExists(mutant);
                  return ResponseEntity.ok().build();
              } else {
                  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

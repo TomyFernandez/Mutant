@@ -11,8 +11,7 @@ public class MutantService {
 
     private final MutantRepository mutantRepository;
     private static final int SEQUENCE_LENGTH = 4;
-    private int sequenceCount = 0;
-    private BitSet checkedPositions;
+
 
     @Autowired
     public MutantService(MutantRepository mutantRepository) {
@@ -22,7 +21,8 @@ public class MutantService {
     public boolean isMutant(String[] dna) {
         validateDna(dna);
         int n = dna.length;
-        checkedPositions = new BitSet(n * n);
+        int sequenceCount = 0;
+        BitSet checkedPositions = new BitSet(n * n);
 
         // Recorrer la matriz por fila y columna
         for (int index = 0; index < n * n; index++) {
@@ -35,22 +35,22 @@ public class MutantService {
             }
 
             // Verificar secuencias mutantes
-            if (checkDirection(dna, row, col, n, 0, 1)) { // Derecha
+            if (checkDirection(dna, row, col, n, 0, 1, checkedPositions)) { // Derecha
                 sequenceCount++;
                 if (sequenceCount > 1) return true;
             }
 
-            if (checkDirection(dna, row, col, n, 1, 0)) { // Abajo
+            if (checkDirection(dna, row, col, n, 1, 0, checkedPositions)) { // Abajo
                 sequenceCount++;
                 if (sequenceCount > 1) return true;
             }
 
-            if (checkDirection(dna, row, col, n, 1, 1)) { // Diagonal derecha-abajo
+            if (checkDirection(dna, row, col, n, 1, 1, checkedPositions)) { // Diagonal derecha-abajo
                 sequenceCount++;
                 if (sequenceCount > 1) return true;
             }
 
-            if (checkDirection(dna, row, col, n, 1, -1)) { // Diagonal izquierda-abajo
+            if (checkDirection(dna, row, col, n, 1, -1, checkedPositions)) { // Diagonal izquierda-abajo
                 sequenceCount++;
                 if (sequenceCount > 1) return true;
             }
@@ -59,13 +59,13 @@ public class MutantService {
     }
 
     // Verificar en una dirección específica y marcar las posiciones ya revisadas
-    private boolean checkDirection(String[] dna, int row, int col, int n, int rowInc, int colInc) {
+    private boolean checkDirection(String[] dna, int row, int col, int n, int rowInc, int colInc, BitSet checkedPositions) {
         if (isInBounds(row, col, rowInc, colInc, n)) {
             int index = row * n + col;
 
             // Si encontramos una secuencia consecutiva, la marcamos
             if (isConsecutive(dna, row, col, rowInc, colInc)) {
-                markCheckedPositions(row, col, rowInc, colInc, n);
+                markCheckedPositions(row, col, rowInc, colInc, n, checkedPositions);
                 return true;
             }
         }
@@ -84,7 +84,7 @@ public class MutantService {
     }
 
     // Marcar posiciones como ya revisadas en el BitSet
-    private void markCheckedPositions(int row, int col, int rowInc, int colInc, int n) {
+    private void markCheckedPositions(int row, int col, int rowInc, int colInc, int n, BitSet checkedPositions) {
         for (int i = 0; i < SEQUENCE_LENGTH; i++) {
             int newRow = row + i * rowInc;
             int newCol = col + i * colInc;
